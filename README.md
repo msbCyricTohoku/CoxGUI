@@ -2,43 +2,46 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Maintained? Yes!](https://img.shields.io/badge/Maintained%3F-Yes!-green.svg)](https://github.com/msbCyricTohoku/CoxGUI) Hey there, data adventurer! 👋 Ready to dive into survival analysis without the usual headaches? The **Cox Regression GUI Analyzer** is your new best friend – a super simple Python desktop app that lets you perform powerful Cox proportional hazards regression with just a few clicks.
+[![Build Status](https://img.shields.io/github/actions/workflow/status/msbCyricTohoku/CoxGUI/main.yml?branch=main)](https://github.com/msbCyricTohoku/CoxGUI/actions)
+[![Issues](https://img.shields.io/github/issues/msbCyricTohoku/CoxGUI)](https://github.com/msbCyricTohoku/CoxGUI/issues)
+[![Downloads](https://img.shields.io/github/downloads/msbCyricTohoku/CoxGUI/total)](https://github.com/msbCyricTohoku/CoxGUI/releases)
 
-Load up your CSV, pick your variables, and let the magic happen! ✨ Whether you're exploring unadjusted effects or diving deep with adjusted models, this tool has got you covered. Plus, you can even peek at the proportional hazards assumption and visualize how your covariates impact survival.
-
----
-
-## 🛠️ Getting Started: What You Need
-
-Before you unleash the power, make sure you've got:
-
-* **Python 3.x:** The engine behind the app. Grab it from [python.org](https://www.python.org/) if you haven't already.
-* **A Few Python Goodies (Libraries):**
-    * `pandas`: For smoothly handling your data.
-    * `lifelines`: The star of the show for all things survival analysis.
-    * `matplotlib`: To make those cool plots pop!
+> A **super simple** Python desktop app for Cox proportional hazards regression — no command-line survival analysis headaches!
 
 ---
 
-## ⚙️ Installation: Quick & Easy
+## ✨ Features
 
-1.  **Grab the Code:** Download or save the Python script (let's call it `cox_gui.py`) to your computer.
-2.  **Install the Squad (Libraries):** Open your terminal or command prompt and type this magic spell:
+- **Load any CSV** and select your time, event, and covariates  
+- **Unadjusted & Adjusted models** with one click  
+- **Proportional Hazards check** (Schoenfeld residuals)  
+- **Interactive plots** of hazard ratios & survival curves  
+- ✅ Export results & plots to PNG/CSV  
+
+---
+
+## 📸 Screenshot
+
+![CoxGUI Screenshot](screenshot.png)
+
+---
+
+## 🛠️ Installation
+
+1. Clone or download this repo:
+    ```bash
+    git clone https://github.com/msbCyricTohoku/CoxGUI.git
+    cd CoxGUI
+    ```
+2. Install dependencies:
     ```bash
     pip install pandas lifelines matplotlib
     ```
 
 ---
 
-## ▶️ Launch Time!
+## ▶️ Usage
 
-Navigate to where you saved `cox_gui.py` in your terminal and hit go:
-`bash`
-`python cox_gui.py`
-
----
-## 🪟 For Windows Users
-💻 Don't want to wrangle the source code? No sweat! 😎 Grab the ready-to-rock Windows `.exe` 🚀 and get started instantly!
-
----
-run and enjoy! -- msb
+Simply run:
+```bash
+python cox_gui.py

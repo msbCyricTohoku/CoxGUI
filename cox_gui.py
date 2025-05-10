@@ -11,7 +11,7 @@ import traceback #error reporting
 class CoxRegressionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Cox Regression Analyzer")
+        self.root.title("Cox Regression GUI Analyzer")
         self.root.geometry("800x700")
 
         self.df = None
