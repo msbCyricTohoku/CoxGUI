@@ -16,7 +16,7 @@
 - **Unadjusted & Adjusted models** with one click  
 - **Proportional Hazards check** (Schoenfeld residuals)  
 - **Interactive plots** of hazard ratios & survival curves  
-- ✅ Export results & plots to PNG/CSV  
+- ✅ Export results to text files and save plots as PNG
 
 ---
 
@@ -45,3 +45,6 @@
 Simply run:
 ```bash
 python cox_gui.py
+```
+
+Use the **File** menu to export analysis results or save the latest plot.

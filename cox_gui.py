@@ -3,9 +3,9 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext, simpledialog
 import pandas as pd
-from lifelines import CoxPHFitter #using lifeline cox fitter
+from lifelines import CoxPHFitter  # using lifeline cox fitter
 from lifelines.utils import concordance_index
-import matplotlib.pyplot as plt #for plots
+import matplotlib.pyplot as plt  # for plots
 import traceback #error reporting
 
 class CoxRegressionApp:
@@ -14,15 +14,32 @@ class CoxRegressionApp:
         self.root.title("Cox Regression GUI Analyzer")
         self.root.geometry("800x700")
 
+        self.last_plot_fig = None
+
         self.df = None
         self.fitted_model = None
         self.last_run_covariates = []
         self.last_run_data_subset = None
 
 
-        #GUI setup
+        # Menu bar
+        self.menu_bar = tk.Menu(self.root)
+        file_menu = tk.Menu(self.menu_bar, tearoff=0)
+        file_menu.add_command(label="Export Results", command=self.export_results)
+        file_menu.add_command(label="Save Last Plot", command=self.save_last_plot)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
+        self.menu_bar.add_cascade(label="File", menu=file_menu)
+
+        help_menu = tk.Menu(self.menu_bar, tearoff=0)
+        help_menu.add_command(label="About", command=self.show_about)
+        self.menu_bar.add_cascade(label="Help", menu=help_menu)
+
+        self.root.config(menu=self.menu_bar)
+
+        # GUI setup
         style = ttk.Style()
-        style.theme_use('clam') 
+        style.theme_use('clam')
 
         main_frame = ttk.Frame(root, padding="10")
         main_frame.pack(expand=True, fill=tk.BOTH)
@@ -73,7 +90,7 @@ class CoxRegressionApp:
         
         self.check_prophaz_button = ttk.Button(analysis_frame, text="Check Proportional Hazards", command=self.check_proportional_hazards)
         self.check_prophaz_button.grid(row=1, column=0, padx=5, pady=5)
-        
+
         plot_effects_frame = ttk.Frame(analysis_frame)
         plot_effects_frame.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
         self.plot_effects_button = ttk.Button(plot_effects_frame, text="Plot Partial Effects for:", command=self.plot_partial_effects)
@@ -81,6 +98,9 @@ class CoxRegressionApp:
         self.plot_covariate_var = tk.StringVar()
         self.plot_covariate_combo = ttk.Combobox(plot_effects_frame, textvariable=self.plot_covariate_var, state="readonly", width=20)
         self.plot_covariate_combo.pack(side=tk.LEFT)
+
+        self.survival_button = ttk.Button(analysis_frame, text="Plot Survival Curve", command=self.plot_survival_curve)
+        self.survival_button.grid(row=2, column=0, padx=5, pady=5)
 
         results_frame = ttk.LabelFrame(main_frame, text="4. Results", padding="10")
         results_frame.pack(expand=True, fill=tk.BOTH, pady=5)
@@ -447,20 +467,96 @@ class CoxRegressionApp:
             self.results_text_append(f"Attempting to plot '{covariate_to_plot}' with values: {plot_values}\n")
 
             self.fitted_model.plot_partial_effects_on_outcome(
-                covariates=[covariate_to_plot], 
-                values=plot_values, 
-                plot_baseline=True, 
-                ax=ax 
+                covariates=[covariate_to_plot],
+                values=plot_values,
+                plot_baseline=True,
+                ax=ax
             )
-            plt.tight_layout() 
-            plt.show() 
-            
+            plt.tight_layout()
+            plt.show()
+
+            self.last_plot_fig = fig
             self.results_text_append(f"Plot for '{covariate_to_plot}' displayed in a new window.\n")
 
         except Exception as e:
             messagebox.showerror("Plotting Error", f"Error plotting partial effects for {covariate_to_plot}: {e}")
             self.results_text_append(f"\nError plotting partial effects for {covariate_to_plot}: {e}\n")
             self.results_text_append(f"Traceback:\n{traceback.format_exc()}\n")
+
+    def plot_survival_curve(self):
+        if self.fitted_model is None or self.last_run_data_subset is None:
+            messagebox.showerror("Error", "Please run a Cox model first and ensure data was available for it.")
+            return
+
+        covariate_to_plot = self.plot_covariate_var.get()
+        if not covariate_to_plot:
+            messagebox.showerror("Error", "Please select a covariate from the dropdown.")
+            return
+
+        if covariate_to_plot not in self.last_run_data_subset.columns:
+            messagebox.showerror("Error", f"Covariate '{covariate_to_plot}' not found in data used for the last model.")
+            return
+
+        try:
+            fig, ax = plt.subplots()
+            df = self.last_run_data_subset.dropna(subset=[covariate_to_plot])
+
+            if pd.api.types.is_numeric_dtype(df[covariate_to_plot]):
+                low_q = df[covariate_to_plot].quantile(0.25)
+                high_q = df[covariate_to_plot].quantile(0.75)
+                groups = {
+                    f"<= {low_q:.2f}": df[df[covariate_to_plot] <= low_q],
+                    f">= {high_q:.2f}": df[df[covariate_to_plot] >= high_q],
+                }
+            else:
+                uniques = df[covariate_to_plot].unique()[:2]
+                groups = {str(val): df[df[covariate_to_plot] == val] for val in uniques}
+
+            for label, subset in groups.items():
+                surv = self.fitted_model.predict_survival_function(subset)
+                surv.plot(ax=ax, label=label)
+
+            ax.set_title(f"Survival Curves by {covariate_to_plot}")
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Survival probability")
+            ax.legend()
+            plt.tight_layout()
+            plt.show()
+
+            self.last_plot_fig = fig
+            self.results_text_append(f"Survival curves plotted for '{covariate_to_plot}'.\n")
+
+        except Exception as e:
+            messagebox.showerror("Plotting Error", f"Error plotting survival curves: {e}")
+            self.results_text_append(f"\nError plotting survival curves: {e}\n")
+            self.results_text_append(f"Traceback:\n{traceback.format_exc()}\n")
+
+    def export_results(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text", "*.txt"), ("All files", "*.*")])
+        if not file_path:
+            return
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(self.results_text.get("1.0", tk.END))
+            messagebox.showinfo("Export", f"Results saved to {file_path}")
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to save results: {e}")
+
+    def save_last_plot(self):
+        if self.last_plot_fig is None:
+            messagebox.showwarning("Save Plot", "No plot has been generated yet.")
+            return
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG", "*.png"), ("All files", "*.*")])
+        if not file_path:
+            return
+        try:
+            self.last_plot_fig.savefig(file_path)
+            messagebox.showinfo("Save Plot", f"Plot saved to {file_path}")
+        except Exception as e:
+            messagebox.showerror("Save Plot", f"Failed to save plot: {e}")
+
+    def show_about(self):
+        messagebox.showinfo("About", "Cox Regression GUI Analyzer\nBuilt with tkinter and lifelines.")
 
 
 
