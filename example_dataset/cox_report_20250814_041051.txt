@@ -1,0 +1,45 @@
+Cox Regression GUI Analyzer — Report
+Saved: 2025-08-14T04:10:53
+Data shape: 432 rows, 9 columns
+Last model type: unadjusted
+Last model covariates: race
+
+Running Unadjusted Cox Regression (Batch)...
+
+--- Univariate model for 'fin' ---
+Fitting model with formula: 'fin'
+
+--- Cox Model Summary ---
+               coef  exp(coef)  se(coef)  coef lower 95%  coef upper 95%  exp(coef) lower 95%  exp(coef) upper 95%  cmp to         z         p  -log2(p)
+covariate                                                                                                                                               
+fin       -0.369069   0.691378  0.189722       -0.740918         0.00278             0.476676             1.002784     0.0 -1.945311  0.051738  4.272644
+
+Concordance Index (C-statistic): 0.5457
+
+--- Univariate model for 'age' ---
+Fitting model with formula: 'age'
+
+--- Cox Model Summary ---
+               coef  exp(coef)  se(coef)  coef lower 95%  coef upper 95%  exp(coef) lower 95%  exp(coef) upper 95%  cmp to        z         p   -log2(p)
+covariate                                                                                                                                               
+age       -0.072845   0.929745   0.02079       -0.113594       -0.032097             0.892621             0.968412     0.0 -3.50382  0.000459  11.090363
+
+Concordance Index (C-statistic): 0.6136
+
+--- Univariate model for 'race' ---
+Fitting model with formula: 'race'
+
+--- Cox Model Summary ---
+               coef  exp(coef)  se(coef)  coef lower 95%  coef upper 95%  exp(coef) lower 95%  exp(coef) upper 95%  cmp to         z         p  -log2(p)
+covariate                                                                                                                                               
+race       0.230816   1.259627  0.305197       -0.367359         0.82899             0.692561             2.291004     0.0  0.756285  0.449478  1.153676
+
+Concordance Index (C-statistic): 0.5137
+
+=== Batch Univariate Summary (most recent per-model estimates) ===
+              coef  exp(coef)  se(coef)         z         p  CI 95% lower  CI 95% upper    n
+variable                                                                                    
+fin      -0.369069   0.691378  0.189722 -1.945311  0.051738     -0.740918      0.002780  432
+age      -0.072845   0.929745  0.020790 -3.503820  0.000459     -0.113594     -0.032097  432
+race      0.230816   1.259627  0.305197  0.756285  0.449478     -0.367359      0.828990  432
+
